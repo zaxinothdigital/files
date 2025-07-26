@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import html
 
+# Folders and files to exclude from indexing
 EXCLUDE_DIRS = {'.git', '.github', '__pycache__'}
 EXCLUDE_FILES = {'generate_index.py'}
 
@@ -14,24 +15,27 @@ def generate_index(dir_path: Path):
         f.write('<!DOCTYPE html><html><head><meta charset="UTF-8">')
         f.write(f'<title>Index of /{rel_path}</title></head><body>\n')
         f.write(f'<h1>Index of /{rel_path}</h1><ul>\n')
-        
+
+        # Link to parent directory if not in root
         if rel_path != Path('.'):
             f.write(f'<li><a href="../">../</a></li>\n')
 
         for entry in entries:
             if entry.name in EXCLUDE_FILES or entry.name.startswith('.'):
                 continue
-            name = html.escape(entry.name)
-            slash = '/' if entry.is_dir() else ''
-            f.write(f'<li><a href="{name}{slash}">{name}{slash}</a></li>\n')
+            name_escaped = html.escape(entry.name)
+            href = name_escaped + ('/' if entry.is_dir() else '')
+            f.write(f'<li><a href="{href}">{name_escaped}{"/" if entry.is_dir() else ""}</a></li>\n')
 
         f.write('</ul></body></html>\n')
 
 def walk_and_generate(base_dir: Path):
     for root, dirs, files in os.walk(base_dir):
         root_path = Path(root)
-        # Remove excluded dirs in-place so os.walk doesn't descend into them
+
+        # Filter out excluded directories so os.walk won't descend into them
         dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS and not d.startswith('.')]
+
         generate_index(root_path)
 
 if __name__ == "__main__":
