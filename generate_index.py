@@ -4,7 +4,7 @@ import html
 
 # Folders and files to exclude from indexing
 EXCLUDE_DIRS = {'.git', '.github', '__pycache__'}
-EXCLUDE_FILES = {'generate_index.py'}
+EXCLUDE_FILES = {'generate_index.py', 'index.html', 'CNAME'}
 
 def generate_index(dir_path: Path):
     entries = sorted(dir_path.iterdir(), key=lambda p: (p.is_file(), p.name.lower()))
